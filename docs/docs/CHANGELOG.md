@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Add internal function `remoteAddrInList` to expressions. Tests for remoteAddress in list of CIDR ip ranges.
+
 <!-- This changes the project to: -->
 
 - Add `contentLength` variable to bot expressions.
