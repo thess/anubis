@@ -104,6 +104,10 @@ func ParseConfig(fin io.Reader, fname string, defaultDifficulty int) (*ParsedCon
 			}
 		}
 
+		if b.MatchAll {
+			parsedBot.MatchAll = b.MatchAll
+		}
+
 		if b.Challenge == nil {
 			parsedBot.Challenge = &config.ChallengeRules{
 				Difficulty: defaultDifficulty,

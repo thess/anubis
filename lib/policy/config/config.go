@@ -55,6 +55,7 @@ type BotConfig struct {
 	Name           string            `json:"name"`
 	Action         Rule              `json:"action"`
 	RemoteAddr     []string          `json:"remote_addresses,omitempty"`
+	MatchAll       bool              `json:"match_all,omitempty"`
 }
 
 func (b BotConfig) Zero() bool {

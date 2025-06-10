@@ -431,7 +431,7 @@ func (s *Server) check(r *http.Request) (policy.CheckResult, *policy.Bot, error)
 	weight := 0
 
 	for _, b := range s.policy.Bots {
-		match, err := b.Rules.Check(r)
+		match, err := b.Rules.Check(r, b.MatchAll)
 		if err != nil {
 			return decaymap.Zilch[policy.CheckResult](), nil, fmt.Errorf("can't run check %s: %w", b.Name, err)
 		}

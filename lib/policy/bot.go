@@ -13,6 +13,7 @@ type Bot struct {
 	Name      string
 	Action    config.Rule
 	Weight    *config.Weight
+	MatchAll  bool
 }
 
 func (b Bot) Hash() string {

@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Add `match_all` boolean to bot rule definitions. If true then all conditions must match.
+
 - Remove the unused `/test-error` endpoint and update the testing endpoint `/make-challenge` to only be enabled in
   development
 - Add `--xff-strip-private` flag/envvar to toggle skipping X-Forwarded-For private addresses or not

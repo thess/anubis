@@ -17,24 +17,39 @@ var (
 )
 
 type Checker interface {
-	Check(*http.Request) (bool, error)
+	Check(r *http.Request, optional ...bool) (bool, error)
 	Hash() string
 }
 
 type CheckerList []Checker
 
-func (cl CheckerList) Check(r *http.Request) (bool, error) {
+func (cl CheckerList) Check(r *http.Request, optional ...bool) (bool, error) {
+	ct := len(cl)
+	nMatch := 0
+	matchAll := false
+
+	// optional is expected to be a single boolean value if supplied
+	if len(optional) > 0 && optional[0] {
+		matchAll = optional[0]
+	}
+
 	for _, c := range cl {
 		ok, err := c.Check(r)
 		if err != nil {
 			return ok, err
 		}
 		if ok {
-			return ok, nil
+			if matchAll {
+				nMatch++
+			} else {
+				return ok, nil
+			}
 		}
 	}
-
-	return false, nil
+	// Note: ct is never zero here, because CheckerList is always initialized with at least one Checker.
+	// If it were empty, the Check method would not be called.
+	// If matchAll is true, we return true only if all checkers matched.
+	return nMatch == ct, nil
 }
 
 func (cl CheckerList) Hash() string {
@@ -89,7 +104,7 @@ func NewRemoteAddrChecker(cidrs []string) (Checker, error) {
 	}, nil
 }
 
-func (rac *RemoteAddrChecker) Check(r *http.Request) (bool, error) {
+func (rac *RemoteAddrChecker) Check(r *http.Request, optional ...bool) (bool, error) {
 	host := r.Header.Get("X-Real-Ip")
 	if host == "" {
 		return false, fmt.Errorf("%w: header X-Real-Ip is not set", ErrMisconfiguration)
@@ -134,7 +149,7 @@ func NewHeaderMatchesChecker(header, rexStr string) (Checker, error) {
 	return &HeaderMatchesChecker{strings.TrimSpace(header), rex, internal.SHA256sum(header + ": " + rexStr)}, nil
 }
 
-func (hmc *HeaderMatchesChecker) Check(r *http.Request) (bool, error) {
+func (hmc *HeaderMatchesChecker) Check(r *http.Request, optional ...bool) (bool, error) {
 	if hmc.regexp.MatchString(r.Header.Get(hmc.header)) {
 		return true, nil
 	}
@@ -159,7 +174,7 @@ func NewPathChecker(rexStr string) (Checker, error) {
 	return &PathChecker{rex, internal.SHA256sum(rexStr)}, nil
 }
 
-func (pc *PathChecker) Check(r *http.Request) (bool, error) {
+func (pc *PathChecker) Check(r *http.Request, optional ...bool) (bool, error) {
 	if pc.regexp.MatchString(r.URL.Path) {
 		return true, nil
 	}
@@ -179,7 +194,7 @@ type headerExistsChecker struct {
 	header string
 }
 
-func (hec headerExistsChecker) Check(r *http.Request) (bool, error) {
+func (hec headerExistsChecker) Check(r *http.Request, optional ...bool) (bool, error) {
 	if r.Header.Get(hec.header) != "" {
 		return true, nil
 	}

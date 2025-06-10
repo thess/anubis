@@ -66,7 +66,7 @@ func (cc *CELChecker) Hash() string {
 	return internal.SHA256sum(cc.src)
 }
 
-func (cc *CELChecker) Check(r *http.Request) (bool, error) {
+func (cc *CELChecker) Check(r *http.Request, optional ...bool) (bool, error) {
 	result, _, err := cc.program.ContextEval(r.Context(), &CELRequest{r})
 
 	if err != nil {
