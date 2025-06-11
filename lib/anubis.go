@@ -28,6 +28,7 @@ import (
 	"github.com/TecharoHQ/anubis/internal/ogtags"
 	"github.com/TecharoHQ/anubis/lib/policy"
 	"github.com/TecharoHQ/anubis/lib/policy/config"
+	"github.com/TecharoHQ/anubis/lib/policy/expressions"
 )
 
 var (
@@ -486,4 +487,5 @@ func (s *Server) check(r *http.Request) (policy.CheckResult, *policy.Bot, error)
 func (s *Server) CleanupDecayMap() {
 	s.DNSBLCache.Cleanup()
 	s.OGTags.Cleanup()
+	expressions.Cleanup()
 }
