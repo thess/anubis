@@ -3,20 +3,20 @@ package expressions
 import (
 	"fmt"
 	"math/rand/v2"
-	"net"
+	"net/netip"
 	"strings"
 
 	"github.com/TecharoHQ/anubis/internal"
+	"github.com/gaissmai/bart"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/google/cel-go/common/types/traits"
 	"github.com/google/cel-go/ext"
-	"github.com/yl2chen/cidranger"
 )
 
-// pre-parsed CIDR ranger map. Hash of CIDR IP list is key
-var CIDRMap = make(map[string]cidranger.Ranger)
+// pre-parsed CIDR bart tables map. Hash of CIDR IP list is key
+var CIDRMap = make(map[string]*bart.Lite)
 
 // buildCacheKey creates a deterministic cache key from the IP list
 func buildCacheKey(ipList traits.Lister) string {
@@ -31,21 +31,21 @@ func buildCacheKey(ipList traits.Lister) string {
 		cidrs = append(cidrs, string(cidr))
 	}
 	// Join them to create a unique key
-	return internal.SHA256sum(strings.Join(cidrs, "|"))
+	return internal.FastHash(strings.Join(cidrs, "|"))
 }
 
-// getCachedRanger returns a cached ranger or builds a new one
-func getCachedRanger(ipList traits.Lister) (cidranger.Ranger, error) {
+// getCachedPrefixTable returns a cached bart table or builds a new one
+func getCachedPrefixTable(ipList traits.Lister) (*bart.Lite, error) {
 	// Build cache key
 	cacheKey := buildCacheKey(ipList)
 
 	// Check cache
-	if ranger, ok := CIDRMap[cacheKey]; ok {
-		return ranger, nil
+	if prefixtable, ok := CIDRMap[cacheKey]; ok {
+		return prefixtable, nil
 	}
 
-	// Build new ranger
-	ranger := cidranger.NewPCTrieRanger()
+	// Build new bart table
+	prefixtable := new(bart.Lite)
 
 	it := ipList.Iterator()
 	for it.HasNext() == types.True {
@@ -54,33 +54,30 @@ func getCachedRanger(ipList traits.Lister) (cidranger.Ranger, error) {
 		if !ok {
 			continue
 		}
-		_, rng, err := net.ParseCIDR(string(cidr))
+		prefix, err := netip.ParsePrefix(string(cidr))
 		if err != nil {
 			return nil, fmt.Errorf("address %s CIDR parse error: %w", cidr, err)
 		}
-		ranger.Insert(cidranger.NewBasicRangerEntry(*rng))
+		prefixtable.Insert(prefix)
 	}
 
 	// Store in map
-	CIDRMap[cacheKey] = ranger
-	return ranger, nil
+	CIDRMap[cacheKey] = prefixtable
+	return prefixtable, nil
 }
 
 func remoteAddrInList(remoteAddr types.String, ipList traits.Lister) (bool, error) {
-	ipAddr := net.ParseIP(string(remoteAddr))
-	if ipAddr == nil {
+	ipAddr, err := netip.ParseAddr(string(remoteAddr))
+	if err != nil {
 		return false, fmt.Errorf("remoteAddrInList: %s is not a valid IP address", remoteAddr)
 	}
 
-	ranger, err := getCachedRanger(ipList)
+	prefixtable, err := getCachedPrefixTable(ipList)
 	if err != nil {
 		return false, fmt.Errorf("remoteAddrInList: %v", err)
 	}
 
-	ok, err := ranger.Contains(ipAddr)
-	if err != nil {
-		return false, fmt.Errorf("remoteAddrInList: error checking if %s is in range: %v", remoteAddr, err)
-	}
+	ok := prefixtable.Contains(ipAddr)
 	return ok, nil
 }
 
