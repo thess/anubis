@@ -1,5 +1,4 @@
 acs
-aeacus
 Aibrew
 alrest
 amazonbot
@@ -175,13 +174,13 @@ lgbt
 licend
 licstart
 lightpanda
-LIMSA
+limsa
 Linting
 linuxbrew
 LLU
 loadbalancer
 lol
-LOMINSA
+lominsa
 maintainership
 malware
 mcr

@@ -49,14 +49,14 @@ jobs:
           platforms: linux/amd64
           push: true
 
-      - name: Apply k8s manifests to aeacus
+      - name: Apply k8s manifests to limsa lominsa
         uses: actions-hub/kubectl@d50394b7d704525f93faefce1e65a6329ff67271 # v1.33.2
         env:
           KUBE_CONFIG: ${{ secrets.LIMSA_LOMINSA_KUBECONFIG }}
         with:
           args: apply -k docs/manifest
 
-      - name: Apply k8s manifests to aeacus
+      - name: Apply k8s manifests to limsa lominsa
         uses: actions-hub/kubectl@d50394b7d704525f93faefce1e65a6329ff67271 # v1.33.2
         env:
           KUBE_CONFIG: ${{ secrets.LIMSA_LOMINSA_KUBECONFIG }}
