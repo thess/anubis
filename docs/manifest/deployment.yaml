@@ -15,6 +15,9 @@ spec:
         - name: anubis
           configMap:
             name: anubis-cfg
+        - name: nginx
+          configMap:
+            name: nginx-cfg
         - name: temporary-data
           emptyDir: {}
       containers:
@@ -28,6 +31,9 @@ spec:
             requests:
               cpu: 250m
               memory: 128Mi
+          volumeMounts:
+            - name: nginx
+              mountPath: /conf
           ports:
             - containerPort: 80
         - name: anubis
