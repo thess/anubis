@@ -13,12 +13,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- This changes the project to: -->
 
-### Added
-
-Anubis now supports these new languages:
-
-- [Italian](https://github.com/TecharoHQ/anubis/pull/778)
-
 ## v1.21.0: Minfilia Warde
 
 > Please, be at ease. You are among friends here.
@@ -40,11 +34,16 @@ Anubis now is able to store things persistently [in memory](./admin/policies.mdx
 Anubis now supports localized responses. Locales can be added in [lib/localization/locales/](https://github.com/TecharoHQ/anubis/tree/main/lib/localization/locales). This release includes support for the following languages:
 
 - [Brazilian Portugese](https://github.com/TecharoHQ/anubis/pull/726)
+- [Chinese (Simplified)](https://github.com/TecharoHQ/anubis/pull/774)
 - [Chinese (Traditional)](https://github.com/TecharoHQ/anubis/pull/759)
 - English
 - [Estonian](https://github.com/TecharoHQ/anubis/pull/783)
+- [Filipino](https://github.com/TecharoHQ/anubis/pull/775)
 - [French](https://github.com/TecharoHQ/anubis/pull/716)
 - [German](https://github.com/TecharoHQ/anubis/pull/741)
+- [Icelandic](https://github.com/TecharoHQ/anubis/pull/780)
+- [Italian](https://github.com/TecharoHQ/anubis/pull/778)
+- [Japanese](https://github.com/TecharoHQ/anubis/pull/772)
 - [Spanish](https://github.com/TecharoHQ/anubis/pull/716)
 - [Turkish](https://github.com/TecharoHQ/anubis/pull/751)
 
@@ -102,6 +101,18 @@ There are a bunch of other assorted features and fixes too:
 - Don't block Anubis starting up if [Thoth](./admin/thoth.mdx) health checks fail.
 
 ### Potentially breaking changes
+
+We try to introduce breaking changes as much as possible, but these are the changes that may be relevant for you as an administrator:
+
+#### Challenge format change
+
+Previously Anubis did no accounting for challenges that it issued. This means that if Anubis restarted during a client, the client would be able to proceed once Anubis came back online.
+
+During the upgrade to v1.21.0 and when v1.21.0 (or later) restarts with the [in-memory storage backend](./admin/policies.mdx#memory), you may see a higher rate of failed challenges than normal. If this persists beyond a few minutes, [open an issue](https://github.com/TecharoHQ/anubis/issues/new).
+
+If you are using the in-memory storage backend, please consider using [a different storage backend](./admin/policies.mdx#storage-backends).
+
+#### Systemd service changes
 
 The following potentially breaking change applies to native installs with systemd only:
 
