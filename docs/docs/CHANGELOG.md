@@ -42,7 +42,7 @@ Anubis now supports localized responses. Locales can be added in [lib/localizati
 - [Brazilian Portugese](https://github.com/TecharoHQ/anubis/pull/726)
 - [Chinese (Traditional)](https://github.com/TecharoHQ/anubis/pull/759)
 - English
-- [Estonian](https://github.com/TecharoHQ/anubis/pull/783) 
+- [Estonian](https://github.com/TecharoHQ/anubis/pull/783)
 - [French](https://github.com/TecharoHQ/anubis/pull/716)
 - [German](https://github.com/TecharoHQ/anubis/pull/741)
 - [Spanish](https://github.com/TecharoHQ/anubis/pull/716)
@@ -99,6 +99,7 @@ There are a bunch of other assorted features and fixes too:
 - Make the [Open Graph](./admin/configuration/open-graph.mdx) subsystem and DNSBL subsystem use [storage backends](./admin/policies.mdx#storage-backends) instead of storing everything in memory by default.
 - Allow [Common Crawl](https://commoncrawl.org/) by default so scrapers have less incentive to scrape
 - The [bbolt storage backend](./admin/policies.mdx#bbolt) now runs its cleanup every hour instead of every five minutes.
+- Don't block Anubis starting up if [Thoth](./admin/thoth.mdx) health checks fail.
 
 ### Potentially breaking changes
 
