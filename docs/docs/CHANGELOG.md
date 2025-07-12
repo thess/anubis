@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > Please, be at ease. You are among friends here.
 
-In this release, Anubis becomes internationalized, gains the ability to use system load as input to issuing challenges,
+In this release, Anubis becomes internationalized, gains the ability to use system load as input to issuing challenges, finally fixes the "invalid response" after "success" bug, and more! Please read these notes before upgrading as the changes are big enough that administrators should take action to ensure that the upgrade goes smoothly.
 
 ### Big ticket changes
 
