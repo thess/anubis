@@ -37,8 +37,8 @@ jobs:
         with:
           images: ghcr.io/techarohq/anubis/docs
           tags: |
-            type=sha,format=long
-            type=edge,branch=main
+            type=sha,enable=true,priority=100,prefix=,suffix=,format=long
+            main
 
       - name: Build and push
         id: build
