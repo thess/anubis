@@ -102,6 +102,7 @@ There are a bunch of other assorted features and fixes too:
 - A race condition involving [opening two challenge pages at once in different tabs](https://github.com/TecharoHQ/anubis/issues/832) causing one of them to fail has been fixed.
 - The "Try again" button on the error page has been fixed. Previously it meant "try the solution again" instead of "try the challenge again".
 - In certain cases, a user could be stuck with a test cookie that is invalid, locking them out of the service for up to half an hour. This has been fixed with better validation of this case and clearing the cookie.
+- Start exposing JA4H fingerprints for later use in CEL expressions.
 
 ### Potentially breaking changes
 
