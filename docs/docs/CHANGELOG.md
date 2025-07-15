@@ -99,6 +99,9 @@ There are a bunch of other assorted features and fixes too:
 - Allow [Common Crawl](https://commoncrawl.org/) by default so scrapers have less incentive to scrape
 - The [bbolt storage backend](./admin/policies.mdx#bbolt) now runs its cleanup every hour instead of every five minutes.
 - Don't block Anubis starting up if [Thoth](./admin/thoth.mdx) health checks fail.
+- A race condition involving [opening two challenge pages at once in different tabs](https://github.com/TecharoHQ/anubis/issues/832) causing one of them to fail has been fixed.
+- The "Try again" button on the error page has been fixed. Previously it meant "try the solution again" instead of "try the challenge again".
+- In certain cases, a user could be stuck with a test cookie that is invalid, locking them out of the service for up to half an hour. This has been fixed with better validation of this case and clearing the cookie.
 
 ### Potentially breaking changes
 
