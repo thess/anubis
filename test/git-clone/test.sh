@@ -21,6 +21,6 @@ docker compose up -d
 
 sleep 2
 
-(cd ./var/clones && git clone http://localhost:3000/status.git)
+(cd ./var/clones && git clone http://localhost:8005/status.git)
 
 docker compose down

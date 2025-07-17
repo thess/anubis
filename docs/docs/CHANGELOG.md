@@ -103,6 +103,7 @@ There are a bunch of other assorted features and fixes too:
 - The "Try again" button on the error page has been fixed. Previously it meant "try the solution again" instead of "try the challenge again".
 - In certain cases, a user could be stuck with a test cookie that is invalid, locking them out of the service for up to half an hour. This has been fixed with better validation of this case and clearing the cookie.
 - Start exposing JA4H fingerprints for later use in CEL expressions.
+- Add `/healthz` route for use in platform-based health checks.
 
 ### Potentially breaking changes
 

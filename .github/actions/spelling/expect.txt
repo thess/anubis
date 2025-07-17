@@ -131,6 +131,7 @@ Hashcash
 hashrate
 headermap
 healthcheck
+healthz
 hec
 hmc
 hostable
