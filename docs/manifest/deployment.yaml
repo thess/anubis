@@ -92,6 +92,7 @@ spec:
               type: RuntimeDefault
           envFrom:
             - secretRef:
+                name: anubis-docs-thoth
           readinessProbe:
             httpGet:
               path: /healthz
