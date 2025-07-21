@@ -26,6 +26,17 @@ Anubis now supports the [`missingHeader`](./admin/configuration/expressions.mdx#
 
 ### Fixes
 
+#### Fix event loop thrashing when solving a proof of work challenge
+
+Previously the "fast" proof of work solver had a fragment of JavaScript that attempted to only post an update about proof of work progress to the main browser window every 1024 iterations. This fragment of JavaScript was subtly incorrect in a way that passed review but actually made the workers send an update back to the main thread every iteration. This caused a pileup of unhandled async calls (similar to a socket accept() backlog pileup in Unix) that caused stack space exhaustion.
+
+This has been fixed in the following ways:
+
+1. The complicated boolean logic has been totally removed in favour of a worker-local iteration counter.
+2. The progress bar is updated by worker `0` instead of all workers.
+
+Hopefully this should limit the event loop thrashing and let ia32 browsers (as well as any environment with a smaller stack size than amd64 and aarch64 seem to have) function normally when processing Anubis proof of work challenges.
+
 #### Fix potential memory leak when discovering a solution
 
 In some cases, the parallel solution finder in Anubis could cause all of the worker promises to leak due to the fact the promises were being improperly terminated. This was fixed by having Anubis debounce worker termination instead of allowing it to potentially recurse infinitely.
