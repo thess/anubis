@@ -23,6 +23,7 @@ func TestLocalizationService(t *testing.T) {
 		"is":    "Hleður...",
 		"pt-BR": "Carregando...",
 		"tr":    "Yükleniyor...",
+		"ru":    "Загрузка...",
 		"zh-CN": "加载中...",
 		"zh-TW": "載入中...",
 	}
@@ -57,7 +58,7 @@ func TestLocalizationService(t *testing.T) {
 }
 
 type manifest struct {
-	SupportedLanguages []string `json:"supported_languages"`
+	SupportedLanguages []string `json:"supportedLanguages"`
 }
 
 func loadManifest(t *testing.T) manifest {
@@ -97,6 +98,11 @@ func TestComprehensiveTranslations(t *testing.T) {
 	}
 
 	sort.Strings(keys)
+
+	manifest := loadManifest(t)
+	if len(manifest.SupportedLanguages) == 0 {
+		t.Fatal("no languages loaded")
+	}
 
 	for _, lang := range loadManifest(t).SupportedLanguages {
 		t.Run(lang, func(t *testing.T) {
