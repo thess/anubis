@@ -12,19 +12,31 @@ export default function process(
     );
 
     const workers = [];
-    const terminate = () => {
+    let settled = false;
+
+    const cleanup = () => {
+      if (settled) {
+        return;
+      }
+      settled = true;
       workers.forEach((w) => w.terminate());
       if (signal != null) {
-        // clean up listener to avoid memory leak
-        signal.removeEventListener("abort", terminate);
-        if (signal.aborted) {
-          console.log("PoW aborted");
-          reject(false);
-        }
+        signal.removeEventListener("abort", onAbort);
       }
+      URL.revokeObjectURL(webWorkerURL);
     };
+
+    const onAbort = () => {
+      console.log("PoW aborted");
+      cleanup();
+      reject(new DOMException("Aborted", "AbortError"));
+    };
+
     if (signal != null) {
-      signal.addEventListener("abort", terminate, { once: true });
+      if (signal.aborted) {
+        return onAbort();
+      }
+      signal.addEventListener("abort", onAbort, { once: true });
     }
 
     for (let i = 0; i < threads; i++) {
@@ -34,13 +46,13 @@ export default function process(
         if (typeof event.data === "number") {
           progressCallback?.(event.data);
         } else {
-          terminate();
+          cleanup();
           resolve(event.data);
         }
       };
 
       worker.onerror = (event) => {
-        terminate();
+        cleanup();
         reject(event);
       };
 
@@ -53,8 +65,6 @@ export default function process(
 
       workers.push(worker);
     }
-
-    URL.revokeObjectURL(webWorkerURL);
   });
 }
 
