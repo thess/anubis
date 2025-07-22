@@ -13,10 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- This changes the project to: -->
 
+## v1.21.1: Minfilia Warde - Echo 1
+
 - Expired records are now properly removed from bbolt databases ([#848](https://github.com/TecharoHQ/anubis/pull/848)).
 - Fix hanging on service restart ([#853](https://github.com/TecharoHQ/anubis/issues/853))
 
 ### Added
+
+Anubis now supports the [`missingHeader`](./admin/configuration/expressions.mdx#missingHeader) to assert the absence of headers in requests.
 
 #### New locales
 
@@ -27,8 +31,6 @@ Anubis now supports these new languages:
 - [Norwegian Bokmål](https://github.com/TecharoHQ/anubis/pull/855)
 - [Norwegian Nynorsk](https://github.com/TecharoHQ/anubis/pull/855)
 - [Russian](https://github.com/TecharoHQ/anubis/pull/882)
-
-Anubis now supports the [`missingHeader`](./admin/configuration/expressions.mdx#missingHeader) to assert the absence of headers in requests.
 
 ### Fixes
 
