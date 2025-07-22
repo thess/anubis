@@ -43,7 +43,7 @@ And this release also fixes the following bugs:
 - In certain cases, a user could be stuck with a test cookie that is invalid, locking them out of the service for up to half an hour. This has been fixed with better validation of this case and clearing the cookie.
 - "Proof of work" has been removed from the branding due to some users having extremely negative connotations with it.
 
-We try to introduce breaking changes as much as possible, but these are the changes that may be relevant for you as an administrator:
+We try to avoid introducing breaking changes as much as possible, but these are the changes that may be relevant for you as an administrator:
 
 - The [challenge format](#challenge-format-change) has been changed in order to account for [the new challenge issuance flow](#challenge-flow-v2).
 - The [systemd service `RuntimeDirectory` has been changed](#breaking-change-systemd-runtimedirectory-change).
