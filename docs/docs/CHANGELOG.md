@@ -18,10 +18,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### New locales
+
 Anubis now supports these new languages:
 
 - [Czech](https://github.com/TecharoHQ/anubis/pull/849)
 - [Finnish](https://github.com/TecharoHQ/anubis/pull/863)
+- [Norwegian Bokmål](https://github.com/TecharoHQ/anubis/pull/855)
+- [Norwegian Nynorsk](https://github.com/TecharoHQ/anubis/pull/855)
 - [Russian](https://github.com/TecharoHQ/anubis/pull/882)
 
 Anubis now supports the [`missingHeader`](./admin/configuration/expressions.mdx#missingHeader) to assert the absence of headers in requests.
