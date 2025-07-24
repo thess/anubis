@@ -399,12 +399,20 @@ func (s *Server) PassChallenge(w http.ResponseWriter, r *http.Request) {
 	}
 
 	redir := r.FormValue("redir")
+
 	redirURL, err := url.ParseRequestURI(redir)
 	if err != nil {
 		lg.Error("invalid redirect", "err", err)
 		s.respondWithError(w, r, localizer.T("invalid_redirect"))
 		return
 	}
+
+	if redirURL.Scheme != "" && redirURL.Scheme != "http" && redirURL.Scheme != "https" {
+		lg.Error("XSS attempt blocked, invalid redirect scheme", "scheme", redirURL.Scheme)
+		s.respondWithStatus(w, r, localizer.T("invalid_redirect"), http.StatusBadRequest)
+		return
+	}
+
 	// used by the path checker rule
 	r.URL = redirURL
 

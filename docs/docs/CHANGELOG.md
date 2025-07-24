@@ -13,6 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- This changes the project to: -->
 
+### Fixes
+
+#### Fixes a problem with nonstandard URLs and redirects
+
+This could allow an attacker to craft an Anubis pass-challenge URL that forces a redirect to nonstandard URLs, such as the `javascript:` scheme which executes arbitrary JavaScript code in a browser context when the user clicks the "Try again" button.
+
+This has been fixed by disallowing any URLs without the scheme `http` or `https`.
+
 ## v1.21.1: Minfilia Warde - Echo 1
 
 - Expired records are now properly removed from bbolt databases ([#848](https://github.com/TecharoHQ/anubis/pull/848)).
