@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- This changes the project to: -->
 
+## v1.21.2: Minfilia Warde - Echo 2
+
 ### Fixes
 
 #### Fixes a problem with nonstandard URLs and redirects
