@@ -192,13 +192,13 @@ func (s *Server) RenderBench(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) respondWithError(w http.ResponseWriter, r *http.Request, message string) {
-	s.respondWithStatus(w, r, message, http.StatusInternalServerError)
+	s.respondWithStatus(w, r, message, "/", http.StatusInternalServerError)
 }
 
-func (s *Server) respondWithStatus(w http.ResponseWriter, r *http.Request, msg string, status int) {
+func (s *Server) respondWithStatus(w http.ResponseWriter, r *http.Request, msg, redirect string, status int) {
 	localizer := localization.GetLocalizer(r)
 
-	templ.Handler(web.Base(localizer.T("oh_noes"), web.ErrorPage(msg, s.opts.WebmasterEmail, r.FormValue("redir"), localizer), s.policy.Impressum, localizer), templ.WithStatus(status)).ServeHTTP(w, r)
+	templ.Handler(web.Base(localizer.T("oh_noes"), web.ErrorPage(msg, s.opts.WebmasterEmail, redirect, localizer), s.policy.Impressum, localizer), templ.WithStatus(status)).ServeHTTP(w, r)
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -238,12 +238,12 @@ func (s *Server) ServeHTTPNext(w http.ResponseWriter, r *http.Request) {
 		redir := r.FormValue("redir")
 		urlParsed, err := r.URL.Parse(redir)
 		if err != nil {
-			s.respondWithStatus(w, r, localizer.T("redirect_not_parseable"), http.StatusBadRequest)
+			s.respondWithStatus(w, r, localizer.T("redirect_not_parseable"), "/", http.StatusBadRequest)
 			return
 		}
 
 		if (len(urlParsed.Host) > 0 && len(s.opts.RedirectDomains) != 0 && !slices.Contains(s.opts.RedirectDomains, urlParsed.Host)) || urlParsed.Host != r.URL.Host {
-			s.respondWithStatus(w, r, localizer.T("redirect_domain_not_allowed"), http.StatusBadRequest)
+			s.respondWithStatus(w, r, localizer.T("redirect_domain_not_allowed"), "/", http.StatusBadRequest)
 			return
 		}
 

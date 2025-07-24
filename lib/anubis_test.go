@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -834,49 +835,56 @@ func TestPassChallengeXSS(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			nonce := 0
-			elapsedTime := 420
-			calculated := ""
-			calcString := fmt.Sprintf("%s%d", chall.Challenge, nonce)
-			calculated = internal.SHA256sum(calcString)
+	t.Run("with test cookie", func(t *testing.T) {
+		for _, tc := range testCases {
+			t.Run(tc.name, func(t *testing.T) {
+				nonce := 0
+				elapsedTime := 420
+				calculated := ""
+				calcString := fmt.Sprintf("%s%d", chall.Challenge, nonce)
+				calculated = internal.SHA256sum(calcString)
 
-			req, err := http.NewRequest(http.MethodGet, ts.URL+"/.within.website/x/cmd/anubis/api/pass-challenge", nil)
-			if err != nil {
-				t.Fatalf("can't make request: %v", err)
-			}
-
-			q := req.URL.Query()
-			q.Set("response", calculated)
-			q.Set("nonce", fmt.Sprint(nonce))
-			q.Set("redir", tc.redir)
-			q.Set("elapsedTime", fmt.Sprint(elapsedTime))
-			req.URL.RawQuery = q.Encode()
-
-			u, err := url.Parse(ts.URL)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			for _, ckie := range cli.Jar.Cookies(u) {
-				if ckie.Name == anubis.TestCookieName {
-					req.AddCookie(ckie)
+				req, err := http.NewRequest(http.MethodGet, ts.URL+"/.within.website/x/cmd/anubis/api/pass-challenge", nil)
+				if err != nil {
+					t.Fatalf("can't make request: %v", err)
 				}
-			}
 
-			resp, err := cli.Do(req)
-			if err != nil {
-				t.Fatalf("can't do request: %v", err)
-			}
+				q := req.URL.Query()
+				q.Set("response", calculated)
+				q.Set("nonce", fmt.Sprint(nonce))
+				q.Set("redir", tc.redir)
+				q.Set("elapsedTime", fmt.Sprint(elapsedTime))
+				req.URL.RawQuery = q.Encode()
 
-			body, _ := io.ReadAll(resp.Body)
+				u, err := url.Parse(ts.URL)
+				if err != nil {
+					t.Fatal(err)
+				}
 
-			if resp.StatusCode != http.StatusBadRequest {
-				t.Errorf("wanted status %d, got %d. body: %s", http.StatusBadRequest, resp.StatusCode, body)
-			}
-		})
-	}
+				for _, ckie := range cli.Jar.Cookies(u) {
+					if ckie.Name == anubis.TestCookieName {
+						req.AddCookie(ckie)
+					}
+				}
+
+				resp, err := cli.Do(req)
+				if err != nil {
+					t.Fatalf("can't do request: %v", err)
+				}
+
+				body, _ := io.ReadAll(resp.Body)
+
+				if bytes.Contains(body, []byte(tc.redir)) {
+					t.Log(string(body))
+					t.Error("found XSS in HTML body")
+				}
+
+				if resp.StatusCode != http.StatusBadRequest {
+					t.Errorf("wanted status %d, got %d. body: %s", http.StatusBadRequest, resp.StatusCode, body)
+				}
+			})
+		}
+	})
 
 	t.Run("no test cookie", func(t *testing.T) {
 		for _, tc := range testCases {
@@ -899,14 +907,17 @@ func TestPassChallengeXSS(t *testing.T) {
 				q.Set("elapsedTime", fmt.Sprint(elapsedTime))
 				req.URL.RawQuery = q.Encode()
 
-				// Do NOT add the test cookie here
-
 				resp, err := cli.Do(req)
 				if err != nil {
 					t.Fatalf("can't do request: %v", err)
 				}
 
 				body, _ := io.ReadAll(resp.Body)
+
+				if bytes.Contains(body, []byte(tc.redir)) {
+					t.Log(string(body))
+					t.Error("found XSS in HTML body")
+				}
 
 				if resp.StatusCode != http.StatusBadRequest {
 					t.Errorf("wanted status %d, got %d. body: %s", http.StatusBadRequest, resp.StatusCode, body)
