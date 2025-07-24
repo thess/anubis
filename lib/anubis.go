@@ -384,6 +384,20 @@ func (s *Server) PassChallenge(w http.ResponseWriter, r *http.Request) {
 	lg := internal.GetRequestLogger(r)
 	localizer := localization.GetLocalizer(r)
 
+	redir := r.FormValue("redir")
+	redirURL, err := url.ParseRequestURI(redir)
+	if err != nil {
+		lg.Error("invalid redirect", "err", err)
+		s.respondWithError(w, r, localizer.T("invalid_redirect"))
+		return
+	}
+
+	if redirURL.Scheme != "" && redirURL.Scheme != "http" && redirURL.Scheme != "https" {
+		lg.Error("XSS attempt blocked, invalid redirect scheme", "scheme", redirURL.Scheme)
+		s.respondWithStatus(w, r, localizer.T("invalid_redirect"), http.StatusBadRequest)
+		return
+	}
+
 	// Adjust cookie path if base prefix is not empty
 	cookiePath := "/"
 	if anubis.BasePrefix != "" {
@@ -395,21 +409,6 @@ func (s *Server) PassChallenge(w http.ResponseWriter, r *http.Request) {
 		s.ClearCookie(w, CookieOpts{Name: anubis.TestCookieName, Host: r.Host})
 		lg.Warn("user has cookies disabled, this is not an anubis bug")
 		s.respondWithError(w, r, localizer.T("cookies_disabled"))
-		return
-	}
-
-	redir := r.FormValue("redir")
-
-	redirURL, err := url.ParseRequestURI(redir)
-	if err != nil {
-		lg.Error("invalid redirect", "err", err)
-		s.respondWithError(w, r, localizer.T("invalid_redirect"))
-		return
-	}
-
-	if redirURL.Scheme != "" && redirURL.Scheme != "http" && redirURL.Scheme != "https" {
-		lg.Error("XSS attempt blocked, invalid redirect scheme", "scheme", redirURL.Scheme)
-		s.respondWithStatus(w, r, localizer.T("invalid_redirect"), http.StatusBadRequest)
 		return
 	}
 
