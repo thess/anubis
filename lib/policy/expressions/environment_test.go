@@ -12,99 +12,228 @@ func TestBotEnvironment(t *testing.T) {
 		t.Fatalf("failed to create bot environment: %v", err)
 	}
 
-	tests := []struct {
-		name        string
-		expression  string
-		headers     map[string]string
-		expected    types.Bool
-		description string
-	}{
-		{
-			name:       "missing-header",
-			expression: `missingHeader(headers, "Missing-Header")`,
-			headers: map[string]string{
-				"User-Agent":   "test-agent",
-				"Content-Type": "application/json",
+	t.Run("missingHeader", func(t *testing.T) {
+		tests := []struct {
+			name        string
+			expression  string
+			headers     map[string]string
+			expected    types.Bool
+			description string
+		}{
+			{
+				name:       "missing-header",
+				expression: `missingHeader(headers, "Missing-Header")`,
+				headers: map[string]string{
+					"User-Agent":   "test-agent",
+					"Content-Type": "application/json",
+				},
+				expected:    types.Bool(true),
+				description: "should return true when header is missing",
 			},
-			expected:    types.Bool(true),
-			description: "should return true when header is missing",
-		},
-		{
-			name:       "existing-header",
-			expression: `missingHeader(headers, "User-Agent")`,
-			headers: map[string]string{
-				"User-Agent":   "test-agent",
-				"Content-Type": "application/json",
+			{
+				name:       "existing-header",
+				expression: `missingHeader(headers, "User-Agent")`,
+				headers: map[string]string{
+					"User-Agent":   "test-agent",
+					"Content-Type": "application/json",
+				},
+				expected:    types.Bool(false),
+				description: "should return false when header exists",
 			},
-			expected:    types.Bool(false),
-			description: "should return false when header exists",
-		},
-		{
-			name:       "case-sensitive",
-			expression: `missingHeader(headers, "user-agent")`,
-			headers: map[string]string{
-				"User-Agent": "test-agent",
+			{
+				name:       "case-sensitive",
+				expression: `missingHeader(headers, "user-agent")`,
+				headers: map[string]string{
+					"User-Agent": "test-agent",
+				},
+				expected:    types.Bool(true),
+				description: "should be case-sensitive (user-agent != User-Agent)",
 			},
-			expected:    types.Bool(true),
-			description: "should be case-sensitive (user-agent != User-Agent)",
-		},
-		{
-			name:        "empty-headers",
-			expression:  `missingHeader(headers, "Any-Header")`,
-			headers:     map[string]string{},
-			expected:    types.Bool(true),
-			description: "should return true for any header when map is empty",
-		},
-		{
-			name:       "real-world-sec-ch-ua",
-			expression: `missingHeader(headers, "Sec-Ch-Ua")`,
-			headers: map[string]string{
-				"User-Agent": "curl/7.68.0",
-				"Accept":     "*/*",
-				"Host":       "example.com",
+			{
+				name:        "empty-headers",
+				expression:  `missingHeader(headers, "Any-Header")`,
+				headers:     map[string]string{},
+				expected:    types.Bool(true),
+				description: "should return true for any header when map is empty",
 			},
-			expected:    types.Bool(true),
-			description: "should detect missing browser-specific headers from bots",
-		},
-		{
-			name:       "browser-with-sec-ch-ua",
-			expression: `missingHeader(headers, "Sec-Ch-Ua")`,
-			headers: map[string]string{
-				"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-				"Sec-Ch-Ua":  `"Chrome"; v="91", "Not A Brand"; v="99"`,
-				"Accept":     "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+			{
+				name:       "real-world-sec-ch-ua",
+				expression: `missingHeader(headers, "Sec-Ch-Ua")`,
+				headers: map[string]string{
+					"User-Agent": "curl/7.68.0",
+					"Accept":     "*/*",
+					"Host":       "example.com",
+				},
+				expected:    types.Bool(true),
+				description: "should detect missing browser-specific headers from bots",
 			},
-			expected:    types.Bool(false),
-			description: "should return false when browser sends Sec-Ch-Ua header",
-		},
-	}
+			{
+				name:       "browser-with-sec-ch-ua",
+				expression: `missingHeader(headers, "Sec-Ch-Ua")`,
+				headers: map[string]string{
+					"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+					"Sec-Ch-Ua":  `"Chrome"; v="91", "Not A Brand"; v="99"`,
+					"Accept":     "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+				},
+				expected:    types.Bool(false),
+				description: "should return false when browser sends Sec-Ch-Ua header",
+			},
+		}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			prog, err := Compile(env, tt.expression)
-			if err != nil {
-				t.Fatalf("failed to compile expression %q: %v", tt.expression, err)
-			}
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				prog, err := Compile(env, tt.expression)
+				if err != nil {
+					t.Fatalf("failed to compile expression %q: %v", tt.expression, err)
+				}
 
-			result, _, err := prog.Eval(map[string]interface{}{
-				"headers": tt.headers,
+				result, _, err := prog.Eval(map[string]interface{}{
+					"headers": tt.headers,
+				})
+				if err != nil {
+					t.Fatalf("failed to evaluate expression %q: %v", tt.expression, err)
+				}
+
+				if result != tt.expected {
+					t.Errorf("%s: expected %v, got %v", tt.description, tt.expected, result)
+				}
 			})
-			if err != nil {
-				t.Fatalf("failed to evaluate expression %q: %v", tt.expression, err)
-			}
+		}
 
-			if result != tt.expected {
-				t.Errorf("%s: expected %v, got %v", tt.description, tt.expected, result)
+		t.Run("function-compilation", func(t *testing.T) {
+			src := `missingHeader(headers, "Test-Header")`
+			_, err := Compile(env, src)
+			if err != nil {
+				t.Fatalf("failed to compile missingHeader expression: %v", err)
 			}
 		})
-	}
+	})
 
-	t.Run("function-compilation", func(t *testing.T) {
-		src := `missingHeader(headers, "Test-Header")`
-		_, err := Compile(env, src)
-		if err != nil {
-			t.Fatalf("failed to compile missingHeader expression: %v", err)
+	t.Run("segments", func(t *testing.T) {
+		for _, tt := range []struct {
+			name        string
+			description string
+			expression  string
+			path        string
+			expected    types.Bool
+		}{
+			{
+				name:        "simple",
+				description: "/ should have one path segment",
+				expression:  `size(segments(path)) == 1`,
+				path:        "/",
+				expected:    types.Bool(true),
+			},
+			{
+				name:        "two segments without trailing slash",
+				description: "/user/foo should have two segments",
+				expression:  `size(segments(path)) == 2`,
+				path:        "/user/foo",
+				expected:    types.Bool(true),
+			},
+			{
+				name:        "at least two segments",
+				description: "/foo/bar/ should have at least two path segments",
+				expression:  `size(segments(path)) >= 2`,
+				path:        "/foo/bar/",
+				expected:    types.Bool(true),
+			},
+			{
+				name:        "at most two segments",
+				description: "/foo/bar/ does not have less than two path segments",
+				expression:  `size(segments(path)) < 2`,
+				path:        "/foo/bar/",
+				expected:    types.Bool(false),
+			},
+		} {
+			t.Run(tt.name, func(t *testing.T) {
+				prog, err := Compile(env, tt.expression)
+				if err != nil {
+					t.Fatalf("failed to compile expression %q: %v", tt.expression, err)
+				}
+
+				result, _, err := prog.Eval(map[string]interface{}{
+					"path": tt.path,
+				})
+				if err != nil {
+					t.Fatalf("failed to evaluate expression %q: %v", tt.expression, err)
+				}
+
+				if result != tt.expected {
+					t.Errorf("%s: expected %v, got %v", tt.description, tt.expected, result)
+				}
+			})
 		}
+
+		t.Run("invalid", func(t *testing.T) {
+			for _, tt := range []struct {
+				name            string
+				description     string
+				expression      string
+				env             any
+				wantFailCompile bool
+				wantFailEval    bool
+			}{
+				{
+					name:        "segments of headers",
+					description: "headers are not a path list",
+					expression:  `segments(headers)`,
+					env: map[string]any{
+						"headers": map[string]string{
+							"foo": "bar",
+						},
+					},
+					wantFailCompile: true,
+				},
+				{
+					name:        "invalid path type",
+					description: "a path should be a sting",
+					expression:  `size(segments(path)) != 0`,
+					env: map[string]any{
+						"path": 4,
+					},
+					wantFailEval: true,
+				},
+				{
+					name:        "invalid path",
+					description: "a path should start with a leading slash",
+					expression:  `size(segments(path)) != 0`,
+					env: map[string]any{
+						"path": "foo",
+					},
+					wantFailEval: true,
+				},
+			} {
+				t.Run(tt.name, func(t *testing.T) {
+					prog, err := Compile(env, tt.expression)
+					if err != nil {
+						if !tt.wantFailCompile {
+							t.Log(tt.description)
+							t.Fatalf("failed to compile expression %q: %v", tt.expression, err)
+						} else {
+							return
+						}
+					}
+
+					_, _, err = prog.Eval(tt.env)
+
+					if err == nil {
+						t.Log(tt.description)
+						t.Fatal("wanted an error but got none")
+					}
+
+					t.Log(err)
+				})
+			}
+		})
+
+		t.Run("function-compilation", func(t *testing.T) {
+			src := `size(segments(path)) <= 2`
+			_, err := Compile(env, src)
+			if err != nil {
+				t.Fatalf("failed to compile missingHeader expression: %v", err)
+			}
+		})
 	})
 }
 

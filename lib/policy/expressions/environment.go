@@ -2,6 +2,7 @@ package expressions
 
 import (
 	"math/rand/v2"
+	"strings"
 
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/types"
@@ -51,6 +52,28 @@ func BotEnvironment() (*cel.Env, error) {
 						return types.Bool(true) // header is missing
 					}
 					return types.Bool(false) // header is present
+				}),
+			),
+		),
+
+		cel.Function("segments",
+			cel.Overload("segments_string_list_string",
+				[]*cel.Type{cel.StringType},
+				cel.ListType(cel.StringType),
+				cel.UnaryBinding(func(path ref.Val) ref.Val {
+					pathStrType, ok := path.(types.String)
+					if !ok {
+						return types.ValOrErr(path, "path is not a string, but is %T", path)
+					}
+
+					pathStr := string(pathStrType)
+					if !strings.HasPrefix(pathStr, "/") {
+						return types.ValOrErr(path, "path does not start with /")
+					}
+
+					pathList := strings.Split(string(pathStr), "/")[1:]
+
+					return types.NewStringList(types.DefaultTypeAdapter, pathList)
 				}),
 			),
 		),
