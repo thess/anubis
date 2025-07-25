@@ -264,7 +264,7 @@ func (s *Server) checkRules(w http.ResponseWriter, r *http.Request, cr policy.Ch
 		hash := rule.Hash()
 
 		lg.Debug("rule hash", "hash", hash)
-		s.respondWithStatus(w, r, fmt.Sprintf("%s %s", localizer.T("access_denied"), hash), "/", s.policy.StatusCodes.Deny)
+		s.respondWithStatus(w, r, fmt.Sprintf("%s %s", localizer.T("access_denied"), hash), s.policy.StatusCodes.Deny)
 		return true
 	case config.RuleChallenge:
 		lg.Debug("challenge requested")
@@ -302,7 +302,7 @@ func (s *Server) handleDNSBL(w http.ResponseWriter, r *http.Request, ip string, 
 				localizer.T("dronebl_entry"),
 				resp.String(),
 				localizer.T("see_dronebl_lookup"),
-				ip), "/", s.policy.StatusCodes.Deny)
+				ip), s.policy.StatusCodes.Deny)
 			return true
 		}
 	}
@@ -388,7 +388,7 @@ func (s *Server) PassChallenge(w http.ResponseWriter, r *http.Request) {
 	redirURL, err := url.ParseRequestURI(redir)
 	if err != nil {
 		lg.Error("invalid redirect", "err", err)
-		s.respondWithStatus(w, r, localizer.T("invalid_redirect"), "/", http.StatusBadRequest)
+		s.respondWithStatus(w, r, localizer.T("invalid_redirect"), http.StatusBadRequest)
 		return
 	}
 
@@ -397,7 +397,7 @@ func (s *Server) PassChallenge(w http.ResponseWriter, r *http.Request) {
 		// allowed
 	default:
 		lg.Error("XSS attempt blocked, invalid redirect scheme", "scheme", redirURL.Scheme)
-		s.respondWithStatus(w, r, localizer.T("invalid_redirect"), "/", http.StatusBadRequest)
+		s.respondWithStatus(w, r, localizer.T("invalid_redirect"), http.StatusBadRequest)
 		return
 	}
 
@@ -466,7 +466,7 @@ func (s *Server) PassChallenge(w http.ResponseWriter, r *http.Request) {
 		case errors.As(err, &cerr):
 			switch {
 			case errors.Is(err, challenge.ErrFailed):
-				s.respondWithStatus(w, r, cerr.PublicReason, "/", cerr.StatusCode)
+				s.respondWithStatus(w, r, cerr.PublicReason, cerr.StatusCode)
 			case errors.Is(err, challenge.ErrInvalidFormat), errors.Is(err, challenge.ErrMissingField):
 				s.respondWithError(w, r, cerr.PublicReason)
 			}

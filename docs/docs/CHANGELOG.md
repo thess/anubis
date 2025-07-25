@@ -23,6 +23,8 @@ This could allow an attacker to craft an Anubis pass-challenge URL that forces a
 
 This has been fixed by disallowing any URLs without the scheme `http` or `https`.
 
+Additionally, the "Try again" button has been fixed to completely ignore the user-supplied redirect location. It now redirects to the home page (`/`).
+
 ## v1.21.1: Minfilia Warde - Echo 1
 
 - Expired records are now properly removed from bbolt databases ([#848](https://github.com/TecharoHQ/anubis/pull/848)).
