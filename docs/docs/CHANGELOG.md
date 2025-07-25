@@ -13,17 +13,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- This changes the project to: -->
 
-## v1.21.2: Minfilia Warde - Echo 2
+## v1.21.3: Minfilia Warde - Echo 3
 
 ### Fixes
 
 #### Fixes a problem with nonstandard URLs and redirects
+
+Fixes [GHSA-jhjj-2g64-px7c](https://github.com/TecharoHQ/anubis/security/advisories/GHSA-jhjj-2g64-px7c).
 
 This could allow an attacker to craft an Anubis pass-challenge URL that forces a redirect to nonstandard URLs, such as the `javascript:` scheme which executes arbitrary JavaScript code in a browser context when the user clicks the "Try again" button.
 
 This has been fixed by disallowing any URLs without the scheme `http` or `https`.
 
 Additionally, the "Try again" button has been fixed to completely ignore the user-supplied redirect location. It now redirects to the home page (`/`).
+
+## v1.21.2: Minfilia Warde - Echo 2
+
+This contained an incomplete fix for [GHSA-jhjj-2g64-px7c](https://github.com/TecharoHQ/anubis/security/advisories/GHSA-jhjj-2g64-px7c). Do not use this version.
 
 ## v1.21.1: Minfilia Warde - Echo 1
 
