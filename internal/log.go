@@ -26,8 +26,8 @@ func InitSlog(level string) {
 	slog.SetDefault(slog.New(h))
 }
 
-func GetRequestLogger(r *http.Request) *slog.Logger {
-	return slog.With(
+func GetRequestLogger(base *slog.Logger, r *http.Request) *slog.Logger {
+	return base.With(
 		"host", r.Host,
 		"method", r.Method,
 		"path", r.URL.Path,
