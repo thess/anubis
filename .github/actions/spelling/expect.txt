@@ -204,7 +204,7 @@ nobots
 NONINFRINGEMENT
 nosleep
 OCOB
-ogtags
+ogtag
 omgili
 omgilibot
 openai
