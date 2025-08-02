@@ -141,6 +141,7 @@ httpdebug
 Huawei
 hypertext
 iaskspider
+iaso
 iat
 ifm
 Imagesift
@@ -232,6 +233,7 @@ promauto
 promhttp
 proofofwork
 publicsuffix
+purejs
 pwcmd
 pwuser
 qualys
@@ -309,7 +311,6 @@ Varis
 Velen
 vendored
 vhosts
-videotest
 VKE
 Vultr
 waitloop

@@ -1,10 +1,4 @@
-import processFast from "./proof-of-work.mjs";
-import processSlow from "./proof-of-work-slow.mjs";
-
-const algorithms = {
-  fast: processFast,
-  slow: processSlow,
-};
+import algorithms from "./algorithms/index.mjs";
 
 // from Xeact
 const u = (url = "", params = {}) => {
@@ -76,11 +70,6 @@ const t = (key) => translations[`js_${key}`] || translations[key] || key;
 
   const dependencies = [
     {
-      name: "WebCrypto",
-      msg: t('web_crypto_error'),
-      value: window.crypto,
-    },
-    {
       name: "Web Workers",
       msg: t('web_workers_error'),
       value: window.Worker,
@@ -118,15 +107,6 @@ const t = (key) => translations[`js_${key}`] || translations[key] || key;
     image.src = imageSrc;
     progress.style.display = "none";
   };
-
-  if (!window.isSecureContext) {
-    ohNoes({
-      titleMsg: t('context_not_secure'),
-      statusMsg: t('context_not_secure_msg'),
-      imageSrc: imageURL("reject", anubisVersion, basePrefix),
-    });
-    return;
-  }
 
   status.innerHTML = t('calculating');
 
@@ -171,6 +151,7 @@ const t = (key) => translations[`js_${key}`] || translations[key] || key;
   try {
     const t0 = Date.now();
     const { hash, nonce } = await process(
+      { basePrefix, version: anubisVersion },
       challenge,
       rules.difficulty,
       null,
