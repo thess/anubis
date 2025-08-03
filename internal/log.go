@@ -50,6 +50,9 @@ func (elf *ErrorLogFilter) Write(p []byte) (n int, err error) {
 	if strings.Contains(logMessage, "context canceled") {
 		return len(p), nil // Suppress the log by doing nothing
 	}
+	if strings.Contains(logMessage, "Unsolicited response received on idle HTTP channel") {
+		return len(p), nil
+	}
 	if elf.Unwrap != nil {
 		return elf.Unwrap.Writer().Write(p)
 	}
