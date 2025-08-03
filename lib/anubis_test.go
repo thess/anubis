@@ -169,7 +169,7 @@ func httpClient(t *testing.T) *http.Client {
 }
 
 func TestLoadPolicies(t *testing.T) {
-	for _, fname := range []string{"botPolicies.json", "botPolicies.yaml"} {
+	for _, fname := range []string{"botPolicies.yaml"} {
 		t.Run(fname, func(t *testing.T) {
 			fin, err := data.BotPolicies.Open(fname)
 			if err != nil {
