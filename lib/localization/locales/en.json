@@ -43,7 +43,7 @@
   "oh_noes": "Oh noes!",
   "benchmarking_anubis": "Benchmarking Anubis!",
   "you_are_not_a_bot": "You are not a bot!",
-  "making_sure_not_bot": "Making sure you're not a bot!",
+  "making_sure_not_bot": "Testing to determine if you are a bot!",
   "celphase": "CELPHASE",
   "js_web_crypto_error": "Your browser doesn't have a functioning web.crypto element. Are you viewing this over a secure context?",
   "js_web_workers_error": "Your browser doesn't support web workers (Anubis uses this to avoid freezing your browser). Do you have a plugin like JShelter installed?",
