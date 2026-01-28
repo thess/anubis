@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add internal function `remoteAddrInList` to expressions. Tests for remoteAddress in list of CIDR ip ranges.
 - Properly handle 4in6 addresses so that IP matching works with those addresses.
+- Expose WEIGHT rule matches as Prometheus metrics.
 
 <!-- This changes the project to: -->
 
